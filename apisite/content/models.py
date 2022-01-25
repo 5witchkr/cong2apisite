@@ -3,7 +3,7 @@ from django.utils import timezone
 
 # Create your models here.
 class Feed(models.Model):
-    user_nickname = models.CharField(max_length=24, null=False, default=False)
+    nickname = models.CharField(max_length=24, null=False, default=False)
     subject = models.CharField(max_length=200, null=False, default=False)
     content = models.TextField()
     image = models.TextField(null=True)#TODO 널값은 정의되지 않은 값을 말하는것이다. ( 빈것이 아님 )

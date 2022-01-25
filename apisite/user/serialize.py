@@ -12,4 +12,4 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
     class Meta:
         model = User
-        fields = ('email', 'password', 'nickname', 'name')
+        fields = ('email', 'password', 'nickname')

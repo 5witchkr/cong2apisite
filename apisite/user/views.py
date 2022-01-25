@@ -35,3 +35,10 @@ class RegistUser(APIView):
 
         serializer.create(request.data)
         return Response(status=200,data=dict(msg="회원가입 성공"))
+
+
+
+class AppLogout(APIView):
+    def post(self, request):
+        request.session.flush()
+        return Response(dict(msg="로그아웃 완료"))
