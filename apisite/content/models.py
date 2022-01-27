@@ -11,7 +11,18 @@ class Feed(models.Model):
     done = models.BooleanField(null=False, default=False)
 
 
-    # 2번테이블
-    #댓글
-    # 3번테이블블
-    #좋아요 - 좋아요는 닉네임이 유니크값
+class Like(models.Model):
+    feedId = models.IntegerField(default=0)
+    nickname = models.CharField(max_length=200, null=False, default=False)
+    isLike = models.BooleanField(default=True)
+
+class Reply(models.Model):
+    feedId = models.IntegerField(default=0)
+    nickname = models.CharField(max_length=200, null=False, default=False)
+    replyFeed = models.TextField()
+
+class Bookmark(models.Model):
+    feedId = models.IntegerField(default=0)
+    nickname = models.CharField(max_length=200, null=False, default=False)
+    isMarked = models.BooleanField(default=True)
+

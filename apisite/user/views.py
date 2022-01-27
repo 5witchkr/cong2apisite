@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from .models import User
 from django.contrib.auth.hashers import make_password, check_password
 from .serialize import UserSerializer
+import logging
 
+logger = logging.getLogger('django')
 
 # Create your views here.
 class AppLogin(APIView):
@@ -24,6 +26,8 @@ class AppLogin(APIView):
 
 class RegistUser(APIView):
     def post(self, request):
+        logger.info("Test RegistUser API START!!!!")
+
         serializer = UserSerializer(request.data)
 
         if User.objects.filter(email=serializer.data['email']).exists():
@@ -34,6 +38,8 @@ class RegistUser(APIView):
             return Response(data)
 
         serializer.create(request.data)
+
+        logger.info("Test RegistUser API END!!!!")
         return Response(status=200,data=dict(msg="회원가입 성공"))
 
 

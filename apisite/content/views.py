@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Feed
+from .models import Feed, Reply, Like, Bookmark
 import os
 from config.settings import MEDIA_ROOT
 from uuid import uuid4
@@ -16,7 +16,6 @@ class Mainpage(APIView):
         Feeds = Feed.objects.all().order_by('-id')
 
         email = request.session.get('email', None)
-
         if email is None:
             return Response(status=400, data=dict(msg="정보를 찾을 수 없음 로그인을 하세요."))
         nickname = User.objects.filter(email=email).first()
@@ -41,12 +40,20 @@ class Mainpage(APIView):
         Feed_list = []
 
         for i in Feeds:
-            Feed_list.append(dict(nickname=i.nickname,
+            replyObjectList = Reply.objects.filter(feedId=i.id)
+            replyList = []
+            for reply in replyObjectList:
+                replyList.append(dict(replyFeed=reply.replyFeed,
+                                      nickname=reply.nickname))
+
+            Feed_list.append(dict(feedId=i.id,
+                                  nickname=i.nickname,
                                   subject=i.subject,
                                   content=i.content,
                                   image=i.image,
                                   create_date=i.create_date,
-                                  done=i.done
+                                  done=i.done,
+                                  replyList=replyList
                                   ))
 
         return Response(status=200, data=dict(Feeds=Feed_list, isLastPage=isLastPage))
@@ -56,7 +63,6 @@ class FeedCreate(APIView):
     def post(self, request):
 
         email = request.session.get('email', None)
-
         if email is None:
             return Response(status=400, data=dict(msg="정보를 찾을 수 없음 로그인을 하세요."))
         nickname = User.objects.filter(email=email).first()
@@ -87,8 +93,8 @@ class FeedCreate(APIView):
 
 class FeedToggle(APIView):
     def post(self, request):
-        email = request.session.get('email', None)
 
+        email = request.session.get('email', None)
         if email is None:
             return Response(status=400, data=dict(msg="정보를 찾을 수 없음 로그인을 하세요."))
         nickname = User.objects.filter(email=email).first()
@@ -109,8 +115,8 @@ class FeedToggle(APIView):
 
 class FeedDelete(APIView):
     def post(self, request):
-        email = request.session.get('email', None)
 
+        email = request.session.get('email', None)
         if email is None:
             return Response(status=400, data=dict(msg="정보를 찾을 수 없음 로그인을 하세요."))
         nickname = User.objects.filter(email=email).first()
@@ -125,3 +131,20 @@ class FeedDelete(APIView):
             return Response(dict(msg="삭제완료"))
         else:
             return Response(dict(msg="권한이 없습니다."))
+
+class UploadReply(APIView):
+    def post(self, request):
+        #TODO 피드아이디 있는지 없는지 확인 후 작성되게 해야함
+        feedId = request.data.get('feedId', None)
+        replyFeed = request.data.get('replyFeed', None)
+
+        email = request.session.get('email', None)
+        if email is None:
+            return Response(status=400, data=dict(msg="정보를 찾을 수 없음 로그인을 하세요."))
+        nickname = User.objects.filter(email=email).first()
+        if nickname is None:
+            return Response(status=400, data=dict(msg="유저정보를 찾을 수 없음."))
+
+        Reply.objects.create(feedId=feedId, replyFeed=replyFeed, nickname=nickname)
+
+        return Response(status=200, data=dict(msg="댓글 작성 완료"))
